@@ -59,6 +59,11 @@ public class JavaDockerCodeSandBox extends JavaCodeSandBoxTemplate{
         ExecuteCodeResponse outputResponse = super.getOutputResponse(runMessageList);
         //5.清理文件
         boolean del = super.deleteFile(userCodeFile);
+        if(del){
+            System.out.println("删除成功");
+        }else{
+            System.out.println("删除失败");
+        }
         return outputResponse;
     }
 
@@ -160,37 +165,38 @@ public class JavaDockerCodeSandBox extends JavaCodeSandBoxTemplate{
             };
 
             //获取占用的内存
-            StatsCmd statsCmd = dockerClient.statsCmd(containerId);
+//            StatsCmd statsCmd = dockerClient.statsCmd(containerId);
 
             final Long[] maxMemory = {0L};
 
-            ResultCallback<Statistics> statisticsResultCallback = statsCmd.exec(new ResultCallback<Statistics>() {
-                @Override
-                public void onStart(Closeable closeable) {
-
-                }
-
-                @Override
-                public void onNext(Statistics statistics) {
-                    System.out.println("内存占用：" + statistics.getMemoryStats().getUsage());
-                    maxMemory[0] = Math.max(statistics.getMemoryStats().getUsage(), maxMemory[0]);
-                }
-
-                @Override
-                public void onError(Throwable throwable) {
-
-                }
-
-                @Override
-                public void onComplete() {
-
-                }
-
-                @Override
-                public void close() throws IOException {
-
-                }
-            });
+//            ResultCallback<Statistics> statisticsResultCallback = statsCmd.exec(new ResultCallback<Statistics>() {
+//                @Override
+//                public void onStart(Closeable closeable) {
+//
+//                }
+//
+//                @Override
+//                public void onNext(Statistics statistics) {
+//                    System.out.println("内存占用：" + statistics.getMemoryStats().getUsage());
+//                    maxMemory[0] = Math.max(statistics.getMemoryStats().getUsage(), maxMemory[0]);
+//
+//                }
+//
+//                @Override
+//                public void onError(Throwable throwable) {
+//
+//                }
+//
+//                @Override
+//                public void onComplete() {
+//
+//                }
+//
+//                @Override
+//                public void close() throws IOException {
+//
+//                }
+//            });
 //            statsCmd.exec(statisticsResultCallback);
             try {
                 stopWatch.start();
@@ -199,13 +205,16 @@ public class JavaDockerCodeSandBox extends JavaCodeSandBoxTemplate{
                         .exec(execStartResultCallback)
                         .awaitCompletion(TIME_OUT, TimeUnit.MILLISECONDS);
                 stopWatch.stop();
-                statsCmd.close();
+//                statsCmd.close();
+//                statisticsResultCallback.close();
             } catch (InterruptedException e) {
                 throw new RuntimeException(e);
             }
             executeMessage.setMemory(maxMemory[0]);
             executeMessage.setTime(stopWatch.getLastTaskTimeMillis());
             runMessageList.add(executeMessage);
+            System.out.println("返回的数据:");
+            System.out.println(runMessageList);
         }
         return runMessageList;
     }
